@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd examples/$1
+sudo make TARGET=cc26x0-cc13x0 BOARD=sensortag/cc2650 -j 16 clean
+sudo make TARGET=cc26x0-cc13x0 BOARD=sensortag/cc2650 -j 16

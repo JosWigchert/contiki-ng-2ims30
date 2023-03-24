@@ -1,4 +1,4 @@
-CONTIKI_PROJECT = hello-world
+CONTIKI_PROJECT = simple-node-2
 all: $(CONTIKI_PROJECT)
 
 CONTIKI = ../..

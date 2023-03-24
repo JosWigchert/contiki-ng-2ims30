@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd examples/$1
+sudo make TARGET=cc26x0-cc13x0 BOARD=sensortag/cc2650 PORT=/dev/ttyACM$2 login

@@ -1,4 +1,4 @@
-CONTIKI_PROJECT = hello-world
+CONTIKI_PROJECT = simple-node-1
 all: $(CONTIKI_PROJECT)
 MODULES += os/services/shell
 CONTIKI = ../..
