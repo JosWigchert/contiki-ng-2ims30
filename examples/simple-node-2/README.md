@@ -1,11 +1,11 @@
-# hello-world
+# simple-node-2
 
 A minimal Contiki-NG example, simple printing out "Hello, world".
 This example runs a full IPv6 stack with 6LoWPAN and RPL.
 It is possible, for example to ping such a node:
 
 ```
-make TARGET=native && sudo ./hello-world.native
+make TARGET=native && sudo ./simple-node-2.native
 ```
 
 Look for the node's global IPv6, e.g.:
