@@ -210,8 +210,8 @@ parse(void)
   frame802154_t frame;
   int hdr_len;
   #ifdef FORCE_TOPOLOGY
-  // fd00::212:4b00:1192:fd83
-  const linkaddr_t linkaddr_br = { { 0x00, 0x12, 0x4b, 0x00, 0x11, 0x92, 0xfd, 0x83 } };
+  // 0012.4b00.1665.3283
+  const linkaddr_t linkaddr_br = { { 0x00, 0x12, 0x4b, 0x00, 0x16, 0x65, 0x32, 0x83 } };
   #endif
   hdr_len = frame802154_parse(packetbuf_dataptr(), packetbuf_datalen(), &frame);
 

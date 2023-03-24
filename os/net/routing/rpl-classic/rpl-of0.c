@@ -178,7 +178,7 @@ best_parent(rpl_parent_t *p1, rpl_parent_t *p2)
   }
   if(!p2_is_acceptable) {
     return p1_is_acceptable ? p1 : NULL;
-  }
+  }objective
 
   dag = p1->dag; /* Both parents are in the same DAG. */
   p1_cost = parent_path_cost(p1);

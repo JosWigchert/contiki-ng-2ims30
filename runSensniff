@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo tools/sensniff/sensniff.py -b 460800 -d /dev/ttyACM$1
