@@ -44,6 +44,8 @@
 #include "net/nbr-table.h"
 #include "net/link-stats.h"
 
+#include "random.h"
+
 #include "sys/log.h"
 
 #define LOG_MODULE "RPL"
@@ -120,12 +122,18 @@ parent_link_metric(rpl_parent_t *p)
 static uint16_t
 parent_rank_increase(rpl_parent_t *p)
 {
-  uint16_t min_hoprankinc;
-  if(p == NULL || p->dag == NULL || p->dag->instance == NULL) {
+    if(p == NULL || p->dag == NULL || p->dag->instance == NULL) {
     return RPL_INFINITE_RANK;
   }
-  min_hoprankinc = p->dag->instance->min_hoprankinc;
-  return (RANK_FACTOR * STEP_OF_RANK(p) + RANK_STRETCH) * min_hoprankinc;
+
+  #ifdef SINKHOLE
+    uint16_t random_rank_increase = random_rand() % 10;
+    return random_rank_increase;
+  #else
+    uint16_t min_hoprankinc;
+    min_hoprankinc = p->dag->instance->min_hoprankinc;
+    return (RANK_FACTOR * STEP_OF_RANK(p) + RANK_STRETCH) * min_hoprankinc;
+  #endif
 }
 /*---------------------------------------------------------------------------*/
 static uint16_t
@@ -144,6 +152,7 @@ rank_via_parent(rpl_parent_t *p)
   if(p == NULL) {
     return RPL_INFINITE_RANK;
   } else {
+    printf("of0: p->rank = %d ~ setting rank to %ld\n", p->rank, MIN((uint32_t)p->rank + parent_rank_increase(p), RPL_INFINITE_RANK));
     return MIN((uint32_t)p->rank + parent_rank_increase(p), RPL_INFINITE_RANK);
   }
 }
@@ -178,7 +187,7 @@ best_parent(rpl_parent_t *p1, rpl_parent_t *p2)
   }
   if(!p2_is_acceptable) {
     return p1_is_acceptable ? p1 : NULL;
-  }objective
+  }
 
   dag = p1->dag; /* Both parents are in the same DAG. */
   p1_cost = parent_path_cost(p1);

