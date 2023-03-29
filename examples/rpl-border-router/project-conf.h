@@ -49,7 +49,6 @@
 #undef IEEE802154_CONF_PANID
 #define IEEE802154_CONF_PANID 0xABD1
 
-#define RPL_CONF_SUPPORTED_OFS {&rpl_of0, &rpl_mrhof}
 #define RPL_CONF_OF_OCP RPL_OCP_OF0
 
 #endif /* PROJECT_CONF_H_ */

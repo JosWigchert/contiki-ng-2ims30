@@ -8,5 +8,7 @@
 #define IEEE802154_CONF_PANID 0xABD1
 
 #define SINKHOLE
+#define RPL_CONF_OF_OCP RPL_OCP_OF0
+
 
 #endif

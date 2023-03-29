@@ -90,7 +90,7 @@
 
 /* Set to 1 to enable RPL statistics */
 #ifndef RPL_CONF_STATS
-#define RPL_CONF_STATS 0
+#define RPL_CONF_STATS 1
 #endif /* RPL_CONF_STATS */
 
 /*
@@ -115,7 +115,7 @@
 #ifdef RPL_CONF_SUPPORTED_OFS
 #define RPL_SUPPORTED_OFS RPL_CONF_SUPPORTED_OFS
 #else /* RPL_CONF_SUPPORTED_OFS */
-#define RPL_SUPPORTED_OFS {&rpl_mrhof}
+#define RPL_SUPPORTED_OFS {&rpl_of0, &rpl_mrhof}
 #endif /* RPL_CONF_SUPPORTED_OFS */
 
 /*

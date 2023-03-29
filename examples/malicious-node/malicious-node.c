@@ -38,6 +38,7 @@
  */
 
 #include "contiki.h"
+#include "gpio-hal.h"
 
 #include <stdio.h> /* For printf() */
 /*---------------------------------------------------------------------------*/
@@ -50,13 +51,34 @@ PROCESS_THREAD(hello_world_process, ev, data)
 
   PROCESS_BEGIN();
 
+
+
   /* Setup a periodic timer that expires after 10 seconds. */
-  etimer_set(&timer, CLOCK_SECOND * 10);
+  etimer_set(&timer, CLOCK_SECOND * .05);
+
+  static uint8_t prev_button0 = 1;
+  static uint8_t prev_button1 = 1;
 
   while(1) {
-    printf("Hello, Malicious Node\n");
+
+    uint8_t button0value = gpio_hal_arch_read_pin(0, 0);
+    uint8_t button1value = gpio_hal_arch_read_pin(0, 4);
+
+    if (button0value != prev_button0 && button0value == 0)
+    {
+      printf("Button0 pressed\n");
+    }
+    if (button1value != prev_button1 && button1value == 0)
+    {
+      printf("Button1 pressed\n");
+    }
+
+    prev_button0 = button0value;
+    prev_button1 = button1value;
+
+    // printf("Hello, Malicious Node\n");
     #ifdef SINKHOLE
-      printf("I am SINKHOLE\n");
+      // printf("I am SINKHOLE\n");
     #endif
 
     /* Wait for the periodic timer to expire and then restart the timer. */
