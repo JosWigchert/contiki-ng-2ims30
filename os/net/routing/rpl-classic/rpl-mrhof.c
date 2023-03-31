@@ -55,6 +55,7 @@
 #define LOG_MODULE "RPL"
 #define LOG_LEVEL LOG_LEVEL_RPL
 
+
 /*
  * RFC6551 and RFC6719 do not mandate the use of a specific formula to
  * compute the ETX value. This MRHOF implementation relies on the
@@ -100,6 +101,8 @@
 
 /* Reject parents that have a higher path cost than the following. */
 #define MAX_PATH_COST      32768   /* Eq path ETX of 256 */
+
+extern bool sinkhole_activated;
 
 /*---------------------------------------------------------------------------*/
 static void
@@ -180,11 +183,13 @@ rank_via_parent(rpl_parent_t *p)
   }
 
   #ifdef SINKHOLE
+  if (sinkhole_activated)
+  {
     /* Rank lower-bound: parent rank + min_hoprankinc */
     uint16_t random_rank_increase = random_rand() % 10;
     printf("mrhof: p->rank = %d ~ setting rank to %ld\n", p->rank, MAX(MIN((uint32_t)p->rank + random_rank_increase, 0xffff), (uint32_t)p->rank));
     return MAX(MIN((uint32_t)p->rank + random_rank_increase, 0xffff), (uint32_t)p->rank);
-    // return 129;
+  }
   #else  
     uint16_t min_hoprankinc;
     uint16_t path_cost;

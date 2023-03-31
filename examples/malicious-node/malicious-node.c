@@ -41,46 +41,109 @@
 #include "gpio-hal.h"
 
 #include <stdio.h> /* For printf() */
+
+#define SINKHOLE
+#define BLACKHOLE
+
+#define BUTTON_0_PIN 0
+#define BUTTON_1_PIN 4
+
+#define LED_0_PIN 10
+#define LED_1_PIN 15
+
 /*---------------------------------------------------------------------------*/
-PROCESS(hello_world_process, "Hello world process");
-AUTOSTART_PROCESSES(&hello_world_process);
+
+#ifdef SINKHOLE
+bool sinkhole_activated = false;
+#endif
+#ifdef BLACKHOLE
+bool blackhole_activated = false;
+#endif
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(hello_world_process, ev, data)
+
+PROCESS(gpio_process, "GPIO handler");
+PROCESS(watchdog_process, "Watchdog handler");
+
+AUTOSTART_PROCESSES(&gpio_process, &watchdog_process);
+
+/*---------------------------------------------------------------------------*/
+
+PROCESS_THREAD(gpio_process, ev, data)
 {
   static struct etimer timer;
 
   PROCESS_BEGIN();
 
-
-
   /* Setup a periodic timer that expires after 10 seconds. */
-  etimer_set(&timer, CLOCK_SECOND * .05);
+  etimer_set(&timer, CLOCK_SECOND * .0167);
 
   static uint8_t prev_button0 = 1;
   static uint8_t prev_button1 = 1;
 
-  while(1) {
-
-    uint8_t button0value = gpio_hal_arch_read_pin(0, 0);
-    uint8_t button1value = gpio_hal_arch_read_pin(0, 4);
+  while(1) 
+  {
+    uint8_t button0value = gpio_hal_arch_read_pin(0, BUTTON_0_PIN);
+    uint8_t button1value = gpio_hal_arch_read_pin(0, BUTTON_1_PIN);
 
     if (button0value != prev_button0 && button0value == 0)
     {
-      printf("Button0 pressed\n");
+      #ifdef SINKHOLE
+      sinkhole_activated = !sinkhole_activated;
+
+      if (sinkhole_activated)
+      {
+        printf("Sinkhole Activated\n");
+        gpio_hal_arch_write_pin(0, LED_0_PIN, true);
+      }
+      else
+      {
+        printf("Sinkhole Deactivated\n");
+        gpio_hal_arch_write_pin(0, LED_0_PIN, false);
+
+      }
+      #endif
     }
     if (button1value != prev_button1 && button1value == 0)
     {
-      printf("Button1 pressed\n");
+      #ifdef BLACKHOLE
+      blackhole_activated = !blackhole_activated;
+
+      if (blackhole_activated)
+      {
+        printf("Blackhole Activated\n");
+        gpio_hal_arch_write_pin(0, LED_1_PIN, true);
+      }
+      else
+      {
+        printf("Blackhole Deactivated\n");
+        gpio_hal_arch_write_pin(0, LED_1_PIN, false);
+      }
+      #endif
     }
 
     prev_button0 = button0value;
     prev_button1 = button1value;
 
-    // printf("Hello, Malicious Node\n");
-    #ifdef SINKHOLE
-      // printf("I am SINKHOLE\n");
-    #endif
+    /* Wait for the periodic timer to expire and then restart the timer. */
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
+    etimer_reset(&timer);
+  }
 
+  PROCESS_END();
+}
+
+PROCESS_THREAD(watchdog_process, ev, data)
+{
+  static struct etimer timer;
+
+  PROCESS_BEGIN();
+
+  /* Setup a periodic timer that expires after 10 seconds. */
+  etimer_set(&timer, CLOCK_SECOND * 10);
+
+  while(1) {
+    printf("Hello, Malicious node\n");
+    
     /* Wait for the periodic timer to expire and then restart the timer. */
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
     etimer_reset(&timer);

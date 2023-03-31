@@ -85,6 +85,8 @@
 #define STEP_OF_RANK(p)       (((3 * parent_link_metric(p)) / LINK_STATS_ETX_DIVISOR) - 2)
 #endif /* RPL_OF0_SR */
 
+extern bool sinkhole_activated;
+
 /*---------------------------------------------------------------------------*/
 static void
 reset(rpl_dag_t *dag)
@@ -127,8 +129,11 @@ parent_rank_increase(rpl_parent_t *p)
   }
 
   #ifdef SINKHOLE
-    uint16_t random_rank_increase = random_rand() % 10;
-    return random_rank_increase;
+    if (sinkhole_activated)
+    {
+      uint16_t random_rank_increase = random_rand() % 10;
+      return random_rank_increase;
+    }
   #else
     uint16_t min_hoprankinc;
     min_hoprankinc = p->dag->instance->min_hoprankinc;
