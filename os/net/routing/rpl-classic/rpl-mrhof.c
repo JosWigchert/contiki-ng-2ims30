@@ -136,6 +136,7 @@ parent_link_metric(rpl_parent_t *p)
   const struct link_stats *stats = rpl_get_parent_link_stats(p);
   if(stats != NULL) {
 #if RPL_MRHOF_SQUARED_ETX
+  /* Rank lower-bound: parent rank + min_hoprankinc */
     uint32_t squared_etx = ((uint32_t)stats->etx * stats->etx) / LINK_STATS_ETX_DIVISOR;
     return (uint16_t)MIN(squared_etx, 0xffff);
 #else /* RPL_MRHOF_SQUARED_ETX */
@@ -182,25 +183,22 @@ rank_via_parent(rpl_parent_t *p)
     return RPL_INFINITE_RANK;
   }
 
-  #ifdef SINKHOLE
+  uint16_t min_hoprankinc;
+  uint16_t path_cost;
+
   if (sinkhole_activated)
   {
-    /* Rank lower-bound: parent rank + min_hoprankinc */
-    uint16_t random_rank_increase = random_rand() % 10;
-    printf("mrhof: p->rank = %d ~ setting rank to %ld\n", p->rank, MAX(MIN((uint32_t)p->rank + random_rank_increase, 0xffff), (uint32_t)p->rank));
-    return MAX(MIN((uint32_t)p->rank + random_rank_increase, 0xffff), (uint32_t)p->rank);
+    min_hoprankinc = (random_rand() % 10) + 1;
+    path_cost = p->rank;
   }
-  #else  
-    uint16_t min_hoprankinc;
-    uint16_t path_cost;
-    
+  else
+  {
     min_hoprankinc = p->dag->instance->min_hoprankinc;
     path_cost = parent_path_cost(p);
+  }
 
-    /* Rank lower-bound: parent rank + min_hoprankinc */
-    return MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost);
-  #endif
-
+  printf("mrhof: p->rank = %d ~ setting rank to %ld ~ sinkhole activated %s\n", p->rank, MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost), sinkhole_activated ? "true" : "false");
+  return MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost);
 }
 /*---------------------------------------------------------------------------*/
 static int
@@ -223,6 +221,11 @@ parent_has_usable_link(rpl_parent_t *p)
 static rpl_parent_t *
 best_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
+  if (sinkhole_activated)
+  {
+    return p1->rank < p2->rank ? p1 : p2;
+  }
+
   rpl_dag_t *dag;
   uint16_t p1_cost;
   uint16_t p2_cost;

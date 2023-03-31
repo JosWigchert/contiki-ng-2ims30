@@ -54,10 +54,10 @@
 /*---------------------------------------------------------------------------*/
 
 #ifdef SINKHOLE
-bool sinkhole_activated = false;
+bool sinkhole_activated;
 #endif
 #ifdef BLACKHOLE
-bool blackhole_activated = false;
+bool blackhole_activated;
 #endif
 /*---------------------------------------------------------------------------*/
 
@@ -79,6 +79,8 @@ PROCESS_THREAD(gpio_process, ev, data)
 
   static uint8_t prev_button0 = 1;
   static uint8_t prev_button1 = 1;
+  sinkhole_activated = false;
+  blackhole_activated = false;
 
   while(1) 
   {

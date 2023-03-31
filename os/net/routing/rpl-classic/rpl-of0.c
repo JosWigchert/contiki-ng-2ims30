@@ -85,8 +85,9 @@
 #define STEP_OF_RANK(p)       (((3 * parent_link_metric(p)) / LINK_STATS_ETX_DIVISOR) - 2)
 #endif /* RPL_OF0_SR */
 
+#ifdef SINKHOLE
 extern bool sinkhole_activated;
-
+#endif
 /*---------------------------------------------------------------------------*/
 static void
 reset(rpl_dag_t *dag)
@@ -131,7 +132,7 @@ parent_rank_increase(rpl_parent_t *p)
   #ifdef SINKHOLE
     if (sinkhole_activated)
     {
-      uint16_t random_rank_increase = random_rand() % 10;
+      uint16_t random_rank_increase = (random_rand() % 10) + 1;
       return random_rank_increase;
     }
   #else
@@ -157,8 +158,9 @@ rank_via_parent(rpl_parent_t *p)
   if(p == NULL) {
     return RPL_INFINITE_RANK;
   } else {
-    printf("of0: p->rank = %d ~ setting rank to %ld\n", p->rank, MIN((uint32_t)p->rank + parent_rank_increase(p), RPL_INFINITE_RANK));
-    return MIN((uint32_t)p->rank + parent_rank_increase(p), RPL_INFINITE_RANK);
+    uint16_t rank_increase = parent_rank_increase(p);
+    printf("of0: p->rank = %d ~ rank increase = %d, setting rank to %ld\n", p->rank, rank_increase, MIN((uint32_t)p->rank + parent_rank_increase(p), RPL_INFINITE_RANK));
+    return MIN((uint32_t)p->rank + rank_increase, RPL_INFINITE_RANK);
   }
 }
 /*---------------------------------------------------------------------------*/
