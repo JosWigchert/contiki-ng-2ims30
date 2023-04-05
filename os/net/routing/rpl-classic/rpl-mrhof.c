@@ -102,8 +102,9 @@
 /* Reject parents that have a higher path cost than the following. */
 #define MAX_PATH_COST      32768   /* Eq path ETX of 256 */
 
+#ifdef SINKHOLE
 extern bool sinkhole_activated;
-
+#endif
 /*---------------------------------------------------------------------------*/
 static void
 reset(rpl_dag_t *dag)
@@ -186,18 +187,24 @@ rank_via_parent(rpl_parent_t *p)
   uint16_t min_hoprankinc;
   uint16_t path_cost;
 
+  min_hoprankinc = p->dag->instance->min_hoprankinc;
+
+  #ifdef SINKHOLE
   if (sinkhole_activated)
   {
-    min_hoprankinc = (random_rand() % 10) + 1;
+    min_hoprankinc += (random_rand() % 10) + 1;
     path_cost = p->rank;
   }
   else
   {
-    min_hoprankinc = p->dag->instance->min_hoprankinc;
     path_cost = parent_path_cost(p);
   }
+  printf("Sinkhole ~ ");
+  #else
+  path_cost = parent_path_cost(p);
+  #endif
 
-  printf("mrhof: p->rank = %d ~ setting rank to %ld ~ sinkhole activated %s\n", p->rank, MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost), sinkhole_activated ? "true" : "false");
+  printf("mrhof: p->rank = %d ~ min hop rank increase = %d ~ setting rank to %ld\n", p->rank, p->dag->instance->min_hoprankinc, MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost));
   return MAX(MIN((uint32_t)p->rank + min_hoprankinc, 0xffff), path_cost);
 }
 /*---------------------------------------------------------------------------*/
@@ -221,10 +228,12 @@ parent_has_usable_link(rpl_parent_t *p)
 static rpl_parent_t *
 best_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
+  #ifdef SINKHOLE
   if (sinkhole_activated)
   {
     return p1->rank < p2->rank ? p1 : p2;
   }
+  #endif
 
   rpl_dag_t *dag;
   uint16_t p1_cost;

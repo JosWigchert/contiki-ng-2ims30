@@ -130,16 +130,15 @@ parent_rank_increase(rpl_parent_t *p)
   }
 
   #ifdef SINKHOLE
-    if (sinkhole_activated)
-    {
-      uint16_t random_rank_increase = (random_rand() % 10) + 1;
-      return random_rank_increase;
-    }
-  #else
-    uint16_t min_hoprankinc;
-    min_hoprankinc = p->dag->instance->min_hoprankinc;
-    return (RANK_FACTOR * STEP_OF_RANK(p) + RANK_STRETCH) * min_hoprankinc;
+  if (sinkhole_activated) {
+    uint16_t random_rank_increase = (random_rand() % 10) + 1;
+    return random_rank_increase;
+  }
   #endif
+  uint16_t min_hoprankinc;
+  min_hoprankinc = p->dag->instance->min_hoprankinc;
+  return (RANK_FACTOR * STEP_OF_RANK(p) + RANK_STRETCH) * min_hoprankinc;
+
 }
 /*---------------------------------------------------------------------------*/
 static uint16_t
