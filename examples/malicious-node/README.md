@@ -1,11 +1,12 @@
-# simple-node-2
+# malicious-node
 
 A minimal Contiki-NG example, simple printing out "Hello, world".
 This example runs a full IPv6 stack with 6LoWPAN and RPL.
 It is possible, for example to ping such a node:
 
+to make this example run the following command in the root of the repository
 ```
-make TARGET=native && sudo ./simple-node-2.native
+./makeExample malicious-node
 ```
 
 Look for the node's global IPv6, e.g.:
