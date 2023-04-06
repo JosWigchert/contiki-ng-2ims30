@@ -1,6 +1,6 @@
 # malicious-node
 
-A minimal Contiki-NG example, simple printing out "Hello, world".
+A minimal Contiki-NG example, simple printing out "Hello, Malicious Node".
 This example runs a full IPv6 stack with 6LoWPAN and RPL.
 It is possible, for example to ping such a node:
 
