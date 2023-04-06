@@ -128,18 +128,17 @@ parent_rank_increase(rpl_parent_t *p)
     if(p == NULL || p->dag == NULL || p->dag->instance == NULL) {
     return RPL_INFINITE_RANK;
   }
+  uint16_t min_hoprankinc;
+  min_hoprankinc = p->dag->instance->min_hoprankinc;
 
   #ifdef SINKHOLE
-    if (sinkhole_activated)
-    {
-      uint16_t random_rank_increase = (random_rand() % 10) + 1;
-      return random_rank_increase;
-    }
-  #else
-    uint16_t min_hoprankinc;
-    min_hoprankinc = p->dag->instance->min_hoprankinc;
-    return (RANK_FACTOR * STEP_OF_RANK(p) + RANK_STRETCH) * min_hoprankinc;
+  if (sinkhole_activated) {
+    uint16_t random_rank_increase = (random_rand() % 10) + 1;
+    return min_hoprankinc + random_rank_increase;
+  }
   #endif
+  
+  return (RANK_FACTOR * STEP_OF_RANK(p) + RANK_STRETCH) * min_hoprankinc;
 }
 /*---------------------------------------------------------------------------*/
 static uint16_t
@@ -180,6 +179,13 @@ parent_has_usable_link(rpl_parent_t *p)
 static rpl_parent_t *
 best_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
+  #ifdef SINKHOLE
+  if (sinkhole_activated)
+  {
+    return p1->rank < p2->rank ? p1 : p2;
+  }
+  #endif
+
   rpl_dag_t *dag;
   uint16_t p1_cost;
   uint16_t p2_cost;

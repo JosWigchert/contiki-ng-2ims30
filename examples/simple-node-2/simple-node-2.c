@@ -41,12 +41,10 @@
 
 #include <stdio.h> /* For printf() */
 
-#include "hdc-1000-sensor.h"
 
 /*---------------------------------------------------------------------------*/
 PROCESS(watchdog_process, "Watchdog process");
-PROCESS(sensor_process, "Sensor process");
-AUTOSTART_PROCESSES(&watchdog_process, &sensor_process);
+AUTOSTART_PROCESSES(&watchdog_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(watchdog_process, ev, data)
 {
@@ -68,34 +66,4 @@ PROCESS_THREAD(watchdog_process, ev, data)
   PROCESS_END();
 }
 
-/*---------------------------------------------------------------------------*/
-
-PROCESS_THREAD(sensor_process, ev, data)
-{
-  static struct etimer timer;
-
-  PROCESS_BEGIN();
-
-  /* Setup a periodic timer that expires after 10 seconds. */
-  etimer_set(&timer, CLOCK_SECOND * 5);
-
-  sensor_init();
-
-  while(1) 
-  {
-    // HDC_1000_SENSOR_TYPE_TEMP or HDC_1000_SENSOR_TYPE_HUMID
-    start();
-    int temperature =  value(HDC_1000_SENSOR_TYPE_TEMP);
-    int humidity =  value(HDC_1000_SENSOR_TYPE_HUMID);
-
-    printf("Temperature: %d \n", temperature);
-    printf("Humidity: %d \n", humidity);
-
-    /* Wait for the periodic timer to expire and then restart the timer. */
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
-    etimer_reset(&timer);
-  }
-
-  PROCESS_END();
-}
 /*---------------------------------------------------------------------------*/
